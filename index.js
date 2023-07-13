@@ -25,16 +25,7 @@ app.use(methodOverride('_method'))
 
 const categories = ['fruit', 'vegetable', 'dairy'];
 
-app.get('/products', async (req, res) => {
-    const { category } = req.query;
-    if (category) {
-        const products = await Product.find({ category })
-        res.render('products/index', { products, category })
-    } else {
-        const products = await Product.find({})
-        res.render('products/index', { products, category: 'All' })
-    }
-})
+
 //FARM ROUTES
 app.get("/farms", async (req, res)=>{
     const farms = await Farm.find({});
@@ -53,6 +44,10 @@ app.get("/farms/:id", async (req, res)=>{
     res.render("farms/show", {farm});
 })
 
+app.get("/farms/:id/products/new", async (req, res)=>{
+    res.render("products/new", { categories });
+})
+
 app.post("/farms",async (req,res)=> {
     const farm = new Farm(req.body);
     await farm.save();
@@ -60,6 +55,17 @@ app.post("/farms",async (req,res)=> {
 })
 
 //PRODUCT ROUTES
+app.get('/products', async (req, res) => {
+    const { category } = req.query;
+    if (category) {
+        const products = await Product.find({ category })
+        res.render('products/index', { products, category })
+    } else {
+        const products = await Product.find({})
+        res.render('products/index', { products, category: 'All' })
+    }
+})
+
 app.get('/products/new', (req, res) => {
     res.render('products/new', { categories })
 })
