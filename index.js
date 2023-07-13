@@ -12,7 +12,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/farmStand', {useNewUrlParser: true, 
         console.log("MONGO CONNECTION OPEN!!!")
     })
     .catch(err => {
-        console.log("OH NO MONGO CONNECTION ERROR!!!!")
+        console.log("OH NO MONGO CONNECTION ERROR!!")
         console.log(err)
     })
 
