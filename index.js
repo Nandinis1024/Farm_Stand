@@ -39,19 +39,41 @@ app.get("/farms/new", (req, res)=>{
 app.get("/farms/:id", async (req, res)=>{
     // find the specific farm by its ID and render it's page with all details on that particular
     const { id } = req.params;
-    const farm = await Farm.findById({_id: id});
+    const farm = await Farm.findById({_id: id}).populate('products');
     //console.log(typeof(farm));
     res.render("farms/show", {farm});
 })
 
+
 app.get("/farms/:id/products/new", async (req, res)=>{
-    res.render("products/new", { categories });
+    const { id } = req.params;
+    const farm = await Farm.findById({_id: id});
+    res.render("products/new", { categories, farm });
 })
 
 app.post("/farms",async (req,res)=> {
     const farm = new Farm(req.body);
     await farm.save();
     res.redirect("/farms");
+})
+
+app.post("/farms/:id", async(req, res)=>{
+    const { id } = req.params;
+    const farm = await Farm.findById({_id: id});
+    const { name, price, category } = req.body;
+    const product = new Product({ name, price, category });
+    farm.products.push(product);
+    product.farm = farm;
+    await farm.save();
+    await product.save();
+    res.redirect(`/farms/${id}`);
+    
+})
+
+app.delete('/farms/:id', async (req, res) => {
+    const farm = await Farm.findByIdAndDelete(req.params.id);
+
+    res.redirect('/farms');
 })
 
 //PRODUCT ROUTES
@@ -78,7 +100,7 @@ app.post('/products', async (req, res) => {
 
 app.get('/products/:id', async (req, res) => {
     const { id } = req.params;
-    const product = await Product.findById(id)
+    const product = await Product.findById(id).populate('farm')
     res.render('products/show', { product })
 })
 
