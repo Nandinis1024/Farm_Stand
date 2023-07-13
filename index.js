@@ -35,7 +35,31 @@ app.get('/products', async (req, res) => {
         res.render('products/index', { products, category: 'All' })
     }
 })
+//FARM ROUTES
+app.get("/farms", async (req, res)=>{
+    const farms = await Farm.find({});
+    res.render("farms/index", { farms });
+})
 
+app.get("/farms/new", (req, res)=>{
+    res.render("farms/new");
+})
+
+app.get("/farms/:id", async (req, res)=>{
+    // find the specific farm by its ID and render it's page with all details on that particular
+    const { id } = req.params;
+    const farm = await Farm.findById({_id: id});
+    //console.log(typeof(farm));
+    res.render("farms/show", {farm});
+})
+
+app.post("/farms",async (req,res)=> {
+    const farm = new Farm(req.body);
+    await farm.save();
+    res.redirect("/farms");
+})
+
+//PRODUCT ROUTES
 app.get('/products/new', (req, res) => {
     res.render('products/new', { categories })
 })
