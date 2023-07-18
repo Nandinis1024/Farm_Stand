@@ -1,11 +1,15 @@
 const express = require('express');
 const app = express();
 const path = require('path');
+const ejsMate = require("ejs-mate");
+const axios = require('axios');
 const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 const port = 3000;
 const Farm = require('./models/farm')
 const Product = require('./models/product');
+
+let api = "https://api.unsplash.com/photos/random?client_id=fOXhsYHzbog9C7j72hwu551kjUdqdxu0hln-G9fqgRM#";
 
 mongoose.connect('mongodb://127.0.0.1:27017/farmStand', {useNewUrlParser: true, useUnifiedTopology: true})
     .then(() => {
@@ -16,7 +20,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/farmStand', {useNewUrlParser: true, 
         console.log(err)
     })
 
-
+app.engine('ejs', ejsMate)
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -53,6 +57,11 @@ app.get("/farms/:id/products/new", async (req, res)=>{
 
 app.post("/farms",async (req,res)=> {
     const farm = new Farm(req.body);
+    const result = await axios.get(api);
+    //console.log(result);
+    const imageUrl = result.data.urls.regular;
+    //console.log(imageUrl);
+    farm.image = imageUrl;
     await farm.save();
     res.redirect("/farms");
 })
